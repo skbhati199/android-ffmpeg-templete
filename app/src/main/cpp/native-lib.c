@@ -1,4 +1,3 @@
-#include <libavcodec/jni.h>
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +5,16 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <android/log.h>
+#include <libavcodec/jni.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/dict.h>
+
+AVFormatContext *i_fmt_ctx;
+AVStream *i_video_stream;
+
+AVFormatContext *o_fmt_ctx;
+AVStream *o_video_stream;
 
 static int pfd[2];
 static pthread_t thr;
@@ -62,7 +71,11 @@ JNIEXPORT jint JNICALL Java_com_syllogismobile_ffmpeg_1sample_VideoKit_run(
     }
 
     jint retcode = 0;
-    retcode = main(argc, argv);
+//    retcode = main(argc, argv);
+
+
+
+
 
     for (i = 0; i < argc; ++i) {
         (*env)->ReleaseStringUTFChars(env, strr[i], argv[i]);
@@ -72,4 +85,37 @@ JNIEXPORT jint JNICALL Java_com_syllogismobile_ffmpeg_1sample_VideoKit_run(
     free(strr);
 
     return retcode;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_syllogismobile_ffmpeg_1sample_VideoManager_createVideoFinal(JNIEnv *env, jobject thiz,
+                                                                     jstring jvideo, jstring start,
+                                                                     jstring middle, jstring end) {
+
+    printf("usage: %s file \n", jvideo);
+    printf("usage: %s file \n", jvideo);
+    AVFormatContext *fmt_ctx = NULL;
+    AVDictionaryEntry *tag = NULL;
+    int ret;
+    const char* videoPath = (*env)->GetStringUTFChars( env, jvideo, NULL ) ;
+    printf("usage: file %s \n", videoPath);
+//    env->ReleaseStringUTFChars(videoPath,videoPath,0);
+//    if (video != 2) {
+//        printf("usage: %s <input_file>\n"
+//               "example program to demonstrate the use of the libavformat metadata API.\n"
+//               "\n", video[0]);
+//        return 1;
+//    }
+    if ((ret = avformat_open_input(&fmt_ctx, videoPath, NULL, NULL)))
+        return ret;
+    if ((ret = avformat_find_stream_info(fmt_ctx, NULL)) < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot find stream information\n");
+        return ret;
+    }
+    while ((tag = av_dict_get(fmt_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+        printf("%s=%s\n", tag->key, tag->value);
+    avformat_close_input(&fmt_ctx);
+    return 0;
+
+
 }
