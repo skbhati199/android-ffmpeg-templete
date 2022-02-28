@@ -80,10 +80,18 @@ class MainActivity : AppCompatActivity() {
         val end:String = "android.resource://"+  getPackageName() + "/" + R.raw.you_finish_workout
         Log.d("TAG", "testing: function $video")
 
+
         GlobalScope.launch(Dispatchers.IO){
+            videoIn = "${getExternalFilesDir(Environment.DIRECTORY_DCIM)}${File.separator}loop_1.mp4"
+            val videoInStr: InputStream = assets.open("loop_1.mp4")
+            val videoOut: OutputStream = FileOutputStream(File(videoIn))
+            copyFile(videoInStr, videoOut)
             Log.d("TAG", "testing: start")
-            videoManager.createVideoFinal("file:///android_asset/loop_1.mp4",start,middle,end)
+            videoManager.createVideoFinal(videoIn,start,middle,end)
+            Log.d("TAG", "testing: duration ${videoManager.getVideoTime(videoIn)}")
             with(Dispatchers.Main) {
+//                videoPlayer.setVideoPath(videoIn)
+//                videoPlayer.start()
                 Log.d("TAG", "testing: done")
             }
         }

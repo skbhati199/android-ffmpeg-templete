@@ -19,4 +19,6 @@ class VideoManager {
     }
 
     external fun createVideoFinal(video:String,start:String,middle:String, end:String): Int
+
+    external fun getVideoTime(video:String) : Int
 }

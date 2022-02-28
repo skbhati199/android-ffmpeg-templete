@@ -92,8 +92,6 @@ Java_com_syllogismobile_ffmpeg_1sample_VideoManager_createVideoFinal(JNIEnv *env
                                                                      jstring jvideo, jstring start,
                                                                      jstring middle, jstring end) {
 
-    printf("usage: %s file \n", jvideo);
-    printf("usage: %s file \n", jvideo);
     AVFormatContext *fmt_ctx = NULL;
     AVDictionaryEntry *tag = NULL;
     int ret;
@@ -107,15 +105,48 @@ Java_com_syllogismobile_ffmpeg_1sample_VideoManager_createVideoFinal(JNIEnv *env
 //        return 1;
 //    }
     if ((ret = avformat_open_input(&fmt_ctx, videoPath, NULL, NULL)))
-        return ret;
+        {
+            fprintf(stderr,"usage: error %s \n", videoPath);
+            return ret;
+
+        }
     if ((ret = avformat_find_stream_info(fmt_ctx, NULL)) < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot find stream information\n");
         return ret;
     }
+
+
     while ((tag = av_dict_get(fmt_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
         printf("%s=%s\n", tag->key, tag->value);
+
+//    int64_t duration = fmt_ctx->streams[0]->duration;
+//    printf("duration=%s\n", duration);
     avformat_close_input(&fmt_ctx);
     return 0;
 
 
+}
+
+JNIEXPORT jint JNICALL
+Java_com_syllogismobile_ffmpeg_1sample_VideoManager_getVideoTime(JNIEnv *env, jobject thiz,
+                                                                 jstring video) {
+    av_register_all();
+    AVFormatContext* pFormatCtx = avformat_alloc_context();
+    const char* videoPath = (*env)->GetStringUTFChars( env, video, NULL ) ;
+    if (avformat_open_input(&pFormatCtx, videoPath, NULL, NULL) < 0) {
+        fprintf(stderr,"File could not open");
+        return 0;
+    }
+
+
+    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+        fprintf(stderr,"File could not open");
+        return 0;
+    }
+
+    int64_t duration = pFormatCtx->duration;
+
+    avformat_close_input(&pFormatCtx);
+    avformat_free_context(pFormatCtx);
+    return (jint) (duration / AV_TIME_BASE);
 }
