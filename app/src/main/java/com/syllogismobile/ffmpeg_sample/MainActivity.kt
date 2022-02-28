@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -34,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         buttonProcess.setOnClickListener { testing() }
 
         videoOut = "${getExternalFilesDir(Environment.DIRECTORY_DCIM)}${File.separator}out_${System.currentTimeMillis()}.mp4"
+        buttonProcess.setOnClickListener { processClicked() }
+
+        videoOut = "${getExternalFilesDir(Environment.DIRECTORY_DCIM)}${File.separator}out.mp4"
         videoIn = "${getExternalFilesDir(Environment.DIRECTORY_DCIM)}${File.separator}in.mp4"
         watermark = "${getExternalFilesDir(Environment.DIRECTORY_DCIM)}${File.separator}watermark.png"
 

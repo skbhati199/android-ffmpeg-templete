@@ -1,3 +1,4 @@
+
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,11 +72,8 @@ JNIEXPORT jint JNICALL Java_com_syllogismobile_ffmpeg_1sample_VideoKit_run(
     }
 
     jint retcode = 0;
-//    retcode = main(argc, argv);
 
-
-
-
+    retcode = main(argc, argv);
 
     for (i = 0; i < argc; ++i) {
         (*env)->ReleaseStringUTFChars(env, strr[i], argv[i]);
